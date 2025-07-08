@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+
+package ordersPB;
+
+
+import "google/protobuf/timestamp.proto";
+
+
+service Orders {
+    rpc Create (Order) returns (Order);
+    rpc Retrieve (OrderId) returns (Order);
+    rpc RetrieveAllStream (NoParam) returns (stream Order);
+}
+
+message NoParam {}
+
+message OrderId {
+    int32 id = 1;
+}
+
+message Order {
+    int32 id = 1;
+    repeated ProductItem products =2;
+    google.protobuf.Timestamp orderedAt = 3;
+}
+
+message ProductItem {
+    int32 id = 1;
+    int32 quantity = 2;
+    int32 price = 3;
+}
