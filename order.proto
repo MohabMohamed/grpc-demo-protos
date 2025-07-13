@@ -6,27 +6,92 @@ package ordersPB;
 
 import "google/protobuf/timestamp.proto";
 
+// resources
 
-service Orders {
-    rpc Create (Order) returns (Order);
-    rpc Retrieve (OrderId) returns (Order);
-    rpc RetrieveAllStream (NoParam) returns (stream Order);
-}
-
-message NoParam {}
-
-message OrderId {
-    int32 id = 1;
+enum Status {
+    UNSET =0;
+    NEW = 1; 
+    CONFIRMED = 2;
+    SHIPPED = 3;
+    DELIVERED = 4; 
+    CANCELED = 5; 
 }
 
 message Order {
     int32 id = 1;
     repeated ProductItem products =2;
     google.protobuf.Timestamp orderedAt = 3;
+    Status status = 4;
 }
 
 message ProductItem {
     int32 id = 1;
     int32 quantity = 2;
     int32 price = 3;
+}
+
+
+// req/res messages
+
+message CreateOrderReq {
+    repeated ProductItem products = 1;
+}
+
+message CreateOrderRes {
+    Order order = 1;
+}
+
+message RetrieveOrderReq {
+    int32 id = 1;
+}
+
+message RetrieveOrderRes {
+    Order order = 1;
+}
+
+message CancelOrderReq {
+    int32 id = 1;
+}
+
+message CancelOrderRes {
+    Order Order =1;
+}
+
+message RetrieveAllStreamReq {}
+
+message RetrieveAllStreamRes {
+    Order order = 1;
+}
+
+message BatchUpdateStatusReq {
+    int32 id=1;
+    Status status = 2;
+}
+
+message BatchUpdateStatusRes {
+    repeated int32 updatedIds=1;
+    int32 affectedCount = 2;
+}
+
+message TrackReq        { 
+    string id = 1;
+}
+message TrackRes         {
+    Status status = 1; 
+    google.protobuf.Timestamp checkedAt = 2; 
+}
+
+
+
+service Orders {
+    // unary
+    rpc Create (CreateOrderReq) returns (CreateOrderRes);
+    rpc Retrieve (RetrieveOrderReq) returns (RetrieveOrderRes);
+    rpc Cancel (CancelOrderReq) returns (CancelOrderRes);
+    // server-client streaming
+    rpc RetrieveAllStream (RetrieveAllStreamReq) returns (stream RetrieveAllStreamRes);
+    // client-server streaming
+    rpc BatchUpdateStatus (stream BatchUpdateStatusReq) returns (BatchUpdateStatusRes);
+    // bi-directional stream
+    rpc Track (stream TrackReq) returns (stream TrackRes);
 }
