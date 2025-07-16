@@ -5,6 +5,7 @@ package ordersPB;
 
 
 import "google/protobuf/timestamp.proto";
+option go_package = "github.com/MohabMohamed/grpc-demo-protos/ordersPB;ordersPB";
 
 // resources
 
@@ -51,6 +52,7 @@ message RetrieveOrderRes {
 
 message CancelOrderReq {
     int32 id = 1;
+    string reason = 2;
 }
 
 message CancelOrderRes {
